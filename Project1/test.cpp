@@ -4,8 +4,23 @@
 
 int main() {
 	syscall(337);
-	long mul = syscall(338, 18, 116);
-	long min = syscall(339, 18, 116);
-	printf ("mul: %li, min: %li \n", mul, min);
+
+	bool correct = true;
+	for (long i = 0; i < 100; ++i) {
+		for (long j = 0; j < 100; ++j) {
+			long mul = syscall(338, i, j);
+			long min = syscall(339, i, j);
+
+			long cMul = i * j;
+			long cMin = (i < j) ? i : j;
+
+			if (mul != cMul || min != cMin) {
+				correct = false;
+				break;
+			}
+		}
+	}
+	if (correct)
+		printf ("10000 tests of mul, min correct.\n");
 	return 0;
 }
