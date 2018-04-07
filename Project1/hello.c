@@ -3,7 +3,7 @@
 
 asmlinkage int sys_hello(void)
 {
-	printk("HELLO SYSTEM CALL Student-b03901018 Student-b03901116\n");
+	printk("HELLO SYSTEM CALL B03901018 B03901116\n");
 	return 0;
 }
 
