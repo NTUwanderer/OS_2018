@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <pthread.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -60,6 +61,11 @@ void *run(void *arg)
 
 int main(int argc, char *argv[])
 {
+    cpu_set_t  mask;
+    CPU_ZERO(&mask);
+    CPU_SET(0, &mask);
+    sched_setaffinity(0, sizeof(mask), &mask);
+
     struct sched_param param;
     struct thread_args *targs;
     pthread_attr_t attr;
@@ -79,7 +85,6 @@ int main(int argc, char *argv[])
 
     if (sched_policy == SCHED_FIFO)
     {
-        printf ("Setting policy to SCHED_FIFO\n");
         param.sched_priority = sched_get_priority_min(sched_policy);
         if ( sched_setscheduler(getpid(), sched_policy, &param) == -1)
         {
