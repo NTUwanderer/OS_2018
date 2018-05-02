@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
         };
     }
     
-    num_threads = 2;
+    num_threads = 4;
     
     //+ create and start each thread
     if ( (threads = malloc(num_threads*sizeof(pthread_t))) == NULL )
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
         struct sched_param param;
         // increasing order
         if (sched_policy == SCHED_FIFO)
-            param.sched_priority = sched_get_priority_max(SCHED_FIFO) - i;
+            param.sched_priority = sched_get_priority_max(SCHED_FIFO) - i - 1;
             // param.sched_priority = sched_get_priority_min(SCHED_FIFO) + i;
         else
             param.sched_priority = 0;
