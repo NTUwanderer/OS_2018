@@ -24,8 +24,6 @@
 #define START_CHAR 97
 
 struct thread_args {
-  int tid;
-  int prio;
   char mychar;
 };
 
@@ -85,7 +83,7 @@ int main(int argc, char *argv[])
 
     if (sched_policy == SCHED_FIFO)
     {
-        param.sched_priority = sched_get_priority_min(sched_policy);
+        param.sched_priority = sched_get_priority_max(sched_policy);
         if ( sched_setscheduler(getpid(), sched_policy, &param) == -1)
         {
             perror("sched_setscheduler");
@@ -99,17 +97,29 @@ int main(int argc, char *argv[])
     if ( (threads = malloc(num_threads*sizeof(pthread_t))) == NULL )
         fail("malloc(num_threads) fail");
         
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
     for (i = 0; i < num_threads; i++)
     {
         targs = malloc(sizeof(*targs));
-        targs->tid    = i;
-        targs->prio   = 1;
         targs->mychar = i + 1 + '0';
+
+        pthread_attr_t attr;
+        pthread_attr_init(&attr);
+
+        struct sched_param param;
+        // increasing order
+        if (sched_policy == SCHED_FIFO)
+            param.sched_priority = sched_get_priority_max(SCHED_FIFO) - i;
+            // param.sched_priority = sched_get_priority_min(SCHED_FIFO) + i;
+        else
+            param.sched_priority = 0;
+
+        pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED);
+        pthread_attr_setschedpolicy(&attr, sched_policy);
+        pthread_attr_setschedparam(&attr, &param);
 
         printf ("Thread %i was created\n", i + 1);
         pthread_create(&threads[i], &attr, run, (void *)targs);
+        pthread_attr_destroy(&attr);
     }
 
     //+ wait for all threads to complete
@@ -118,6 +128,7 @@ int main(int argc, char *argv[])
         pthread_join(threads[i], NULL);
     }
 
+    free(threads);
     //+ clean up and exit
     pthread_attr_destroy(&attr);
     pthread_exit (NULL);
