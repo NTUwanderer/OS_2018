@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
         };
     }
     
-    num_threads = 4;
+    num_threads = 2;
     
     //+ create and start each thread
     if ( (threads = malloc(num_threads*sizeof(pthread_t))) == NULL )
@@ -130,6 +130,6 @@ int main(int argc, char *argv[])
 
     free(threads);
     //+ clean up and exit
-    pthread_attr_destroy(&attr);
+    //pthread_attr_destroy(&attr);
     pthread_exit (NULL);
 }
